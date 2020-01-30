@@ -25,6 +25,18 @@ def apply_X(circuit, i):
   circuit.edges[i] ^ X_gate.node[0]
   circuit.edges[i] = X_gate.node[1]
 
+def apply_Y(circuit, i):
+  _check_input(circuit, i)
+  Y_gate = gates.Y_gate()
+  circuit.edges[i] ^ Y_gate.node[0]
+  circuit.edges[i] = Y_gate.node[1]
+
+def apply_T(circuit, i):
+  _check_input(circuit, i)
+  T_gate = gates.T_gate()
+  circuit.edges[i] ^ T_gate.node[0]
+  circuit.edges[i] = T_gate.node[1]
+
 def apply_CNOT(circuit, a, b):
   _check_input(circuit, a, b)
   cnot_gate = gates.CNOT_gate()
@@ -47,6 +59,8 @@ def calculate(circuit):
 
 def get_probability(result, bitstring):
   demention = len(result.tensor.shape)
+  if not demention == len(bitstring):
+    raise ValueError("The bitstring have to be equal to number of qbits.")
   crnt = result.tensor
   for i in range(demention):
     crnt = crnt[bitstring[i]]

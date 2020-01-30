@@ -13,6 +13,7 @@ class Circuit():
     self.qbits = []
     self.edges = []
     self.usage = []
+    self.n_qbits = number_of_qbits
     for i in range(number_of_qbits):
    #   qbit = Qbit()
       qbit = tn.Node(np.array([1.0 + 0j, 0.0 + 0j]))
