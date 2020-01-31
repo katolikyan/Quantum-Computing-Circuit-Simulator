@@ -22,40 +22,45 @@ def _check_input(circuit, *indexes):
 def apply_X(circuit, i):
   _check_input(circuit, i);
   X_gate = gates.X_gate()
-  circuit.edges[i] ^ X_gate.node[0]
-  circuit.edges[i] = X_gate.node[1]
+  circuit._edges[i] ^ X_gate.node[0]
+  circuit._edges[i] = X_gate.node[1]
 
 def apply_Y(circuit, i):
   _check_input(circuit, i)
   Y_gate = gates.Y_gate()
-  circuit.edges[i] ^ Y_gate.node[0]
-  circuit.edges[i] = Y_gate.node[1]
+  circuit._edges[i] ^ Y_gate.node[0]
+  circuit._edges[i] = Y_gate.node[1]
 
 def apply_T(circuit, i):
   _check_input(circuit, i)
   T_gate = gates.T_gate()
-  circuit.edges[i] ^ T_gate.node[0]
-  circuit.edges[i] = T_gate.node[1]
+  circuit._edges[i] ^ T_gate.node[0]
+  circuit._edges[i] = T_gate.node[1]
 
 def apply_CNOT(circuit, a, b):
   _check_input(circuit, a, b)
   cnot_gate = gates.CNOT_gate()
-  circuit.edges[a] ^ cnot_gate.node[0]
-  circuit.edges[b] ^ cnot_gate.node[1]
-  circuit.edges[a] = cnot_gate.node[2]
-  circuit.edges[b] = cnot_gate.node[3]
+  circuit._edges[a] ^ cnot_gate.node[0]
+  circuit._edges[b] ^ cnot_gate.node[1]
+  circuit._edges[a] = cnot_gate.node[2]
+  circuit._edges[b] = cnot_gate.node[3]
 
 def apply_H(circuit, i):
   _check_input(circuit, i);
   H_gate = gates.H_gate()
-  circuit.edges[i] ^ H_gate.node[0]
-  circuit.edges[i] = H_gate.node[1]
+  circuit._edges[i] ^ H_gate.node[0]
+  circuit._edges[i] = H_gate.node[1]
 
 def calculate(circuit):
   if not isinstance(circuit, Circuit):
     raise ValueError("calculate function accepts only circuit object")
-  nodes = tn.reachable(circuit.qbits[0])
-  return tn.contractors.optimal(nodes, ignore_edge_order=True)
+  nodes = tn.reachable(circuit._edges[0])
+  result = tn.contractors.optimal(nodes, circuit._edges)
+
+  for i in range(len(result.tensor.shape)):
+    circuit._edges[i] = result.get_edge(i)
+
+  return result
 
 def get_probability(result, bitstring):
   demention = len(result.tensor.shape)
