@@ -18,7 +18,7 @@ class Circuit():
     #self.qasm = []           # append qasm notation after every function call.
 
     for i in range(number_of_qbits):
-      qbit = tn.Node(np.array([1.0 + 0j, 0.0 + 0j]))
+      qbit = self._qbit_init()
       self._qbits.append(qbit)
       self._edges.append(qbit[0])
 
@@ -27,17 +27,23 @@ class Circuit():
     for i, edge in enumerate(self.circuit):
       self._edges[i] = edge
 
-  def _qbit_init():
+  def _qbit_init(self):
     return tn.Node(np.array([1.0 + 0j, 0.0 + 0j]))
 
   def _check_input(self, *indexes):
+    distinct = []
     for index in indexes:
       if not isinstance(index, int):
-        raise ValueError("Starting from second argument the values have to be "
-                         "indexes of circuit qubits")
+        raise ValueError("The values have to be indexes of "
+                         "the circuit's qubits.")
       if index >= self._num_of_qbits or index < -self._num_of_qbits:
         raise ValueError("Index passed in is out of range. "
                          "Index represents the qbit you are trying to access.")
+      if index not in distinct:
+        distinct.append(index)
+      else:
+        raise ValueError("Indexes of qbits have to be distinct numbers. "
+                         "It helps to prevent usless extra  calculations.")
 
   def x(self, i):
     self._check_input(i)
@@ -48,8 +54,8 @@ class Circuit():
   def y(self, i):
     self._check_input(i)
     y = gates.Y_gate()
-    self._edges[i] ^ y.node[0]
-    self._edges[i] = y.node[1]
+    self._edges[i] ^ y.node[1]
+    self._edges[i] = y.node[0]
 
   def z(self, i):
     self._check_input(i)
@@ -103,7 +109,7 @@ class Circuit():
 
   def execute(self):
     nodes = tn.reachable(self._edges[0])
-    result = tn.contractors.optimal(nodes, self._edges)
+    result = tn.contractors.greedy(nodes, self._edges)
     for i in range(len(result.tensor.shape)):
       self._edges[i] = result.get_edge(i)
     return result
@@ -114,8 +120,8 @@ class Circuit():
       raise ValueError("The bitstring have to be equal to number of qbits.")
     crnt = result.tensor
     for i in range(demention):
-      crnt = crnt[bitstring[i]]
-    return (crnt * crnt)
+      crnt = crnt[int(bitstring[i])]
+    return crnt * np.conj(crnt)
 
 
 def circuit_init(n_qbit):
