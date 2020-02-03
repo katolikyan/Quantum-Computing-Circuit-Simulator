@@ -1,15 +1,6 @@
 import tensornetwork as tn
 import numpy as np
 
-class CX_gate():
-
-  def __init__(self):
-    gate_op = np.array([[1, 0, 0, 0],
-                        [0, 1, 0, 0],
-                        [0, 0, 0, 1],
-                        [0, 0, 1, 0]]).reshape(2, 2, 2, 2)
-    self.node = tn.Node(gate_op)
-
 class X_gate():
 
   def __init__(self):
@@ -44,6 +35,16 @@ class T_gate():
     gate_op = np.array([[1, 0],
                         [0, np.exp(1j * np.pi / 4)]])
     self.node = tn.Node(gate_op)
+
+class CX_gate():
+
+  def __init__(self):
+    gate_op = np.array([[1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 0, 1],
+                        [0, 0, 1, 0]]).reshape(2, 2, 2, 2)
+    self.node = tn.Node(gate_op)
+
 
 class CZ_gate():
 

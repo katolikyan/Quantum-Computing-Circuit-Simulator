@@ -33,8 +33,7 @@ def test_gates_check_input():
   with(pytest.raises(ValueError)):
     circuit.x("0")
 
-
-def test_solo_gates_simpletest():
+def test_single_gates_simpletest():
   circuit = qcs.circuit_init(1)
   circuit.x(0)
   circuit.y(0)
@@ -43,7 +42,7 @@ def test_solo_gates_simpletest():
   circuit.t(0)
   result = circuit.execute()
 
-def test_controlled_gates_simpletest():
+def test_controll_gates_simpletest():
   circuit = qcs.circuit_init(2)
   circuit.ch(0, 1)
   circuit.cx(0, 1)
@@ -52,66 +51,216 @@ def test_controlled_gates_simpletest():
   result = circuit.execute()
 
 def test_x_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(1)
+  circuit.x(0)
+  result = circuit.execute()
+
   S_simulator = Aer.backends(name='statevector_simulator')[0]
   q = QuantumRegister(1)
   qubit = QuantumCircuit(q)
   qubit.x(q[0])
   job = execute(qubit, S_simulator)
-  result = job.result()
-  circuit = qcs.circuit_init(1)
-  circuit.x(0)
-  res = circuit.execute()
-  arr1 = result.get_statevector()
-  arr2 = res.tensor.flatten()
-  assert np.testing.assert_allclose(arr1, arr2, atol=0, rtol=1e-5) == None
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
 
 def test_y_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(1)
+  circuit.y(0)
+  result = circuit.execute()
+
   S_simulator = Aer.backends(name='statevector_simulator')[0]
   q = QuantumRegister(1)
   qubit = QuantumCircuit(q)
   qubit.y(q[0])
   job = execute(qubit, S_simulator)
-  result = job.result()
-  circuit = qcs.circuit_init(1)
-  circuit.y(0)
-  res = circuit.execute()
-  arr1 = result.get_statevector()
-  arr2 = res.tensor.flatten()
-  assert np.testing.assert_allclose(arr1, arr2, atol=0, rtol=1e-5) == None
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
 
 def test_z_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(1)
+  circuit.z(0)
+  result = circuit.execute()
+
   S_simulator = Aer.backends(name='statevector_simulator')[0]
   q = QuantumRegister(1)
   qubit = QuantumCircuit(q)
   qubit.z(q[0])
   job = execute(qubit, S_simulator)
-  result = job.result()
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_h_gate_qiskit_comparison():
   circuit = qcs.circuit_init(1)
-  circuit.z(0)
-  res = circuit.execute()
-  arr1 = result.get_statevector()
-  arr2 = res.tensor.flatten()
-  assert np.testing.assert_allclose(arr1, arr2, atol=0, rtol=1e-5) == None
+  circuit.h(0)
+  result = circuit.execute()
 
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(1)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
 
-def test_circuit_3_qiskit_compartison():
-  circuit_3 = qcs.circuit_init(3)
-  circuit_3.y(0)
-  circuit_3.h(0)
-  circuit_3.x(0)
-  circuit_3.cx(0, 1)
-  circuit_3.h(0)
-  circuit_3.cz(1, 2)
-  circuit_3.cy(0, 2)
-  circuit_3.cy(0, 2)
-  circuit_3.cz(1, 2)
-  circuit_3.h(0)
-  circuit_3.cx(0, 1)
-  circuit_3.x(0)
-  circuit_3.h(0)
-  circuit_3.y(0)
-  result_3 = circuit_3.execute()
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
 
+def test_t_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(1)
+  circuit.t(0)
+  result = circuit.execute()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(1)
+  qubit = QuantumCircuit(q)
+  qubit.t(q[0])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+# CNOT, CZ, CY, CH,
+def test_cx_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(2)
+  circuit.h(0)
+  circuit.cx(0, 1)
+  result = circuit.execute()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(2)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.cx(q[0], q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_cz_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(2)
+  circuit.h(0)
+  circuit.cz(0, 1)
+  result = circuit.execute()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(2)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.cz(q[0], q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_cy_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(2)
+  circuit.h(0)
+  circuit.cy(0, 1)
+  result = circuit.execute()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(2)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.cy(q[0], q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_ch_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(2)
+  circuit.h(0)
+  circuit.ch(0, 1)
+  result = circuit.execute()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(2)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.ch(q[0], q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_circuit1_qiskit_compartison():
+  circuit = qcs.circuit_init(2)
+  circuit.h(0)
+  circuit.cx(0, 1)
+  result = circuit.execute()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(2)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.cx(q[0], q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_circuit2_qiskit_compartison():
+  circuit = qcs.circuit_init(2)
+  circuit.x(1)
+  circuit.cx(0, 1)
+  circuit.cx(1, 0)
+  circuit.cx(0, 1)
+  result = circuit.execute()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(2)
+  qubit = QuantumCircuit(q)
+  qubit.x(q[1])
+  qubit.cx(q[0], q[1])
+  qubit.cx(q[1], q[0])
+  qubit.cx(q[0], q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_circuit3_qiskit_compartison():
+  circuit = qcs.circuit_init(3)
+  circuit.y(0)
+  circuit.h(0)
+  circuit.x(0)
+  circuit.cx(0, 1)
+  circuit.h(0)
+  circuit.cz(1, 2)
+  circuit.cy(0, 2)
+  circuit.cy(0, 2)
+  circuit.cz(1, 2)
+  circuit.h(0)
+  circuit.cx(0, 1)
+  circuit.x(0)
+  circuit.h(0)
+  circuit.y(0)
+  result = circuit.execute()
 
   S_simulator = Aer.backends(name='statevector_simulator')[0]
   q = QuantumRegister(3)
@@ -131,8 +280,8 @@ def test_circuit_3_qiskit_compartison():
   qubit.h(q[0])
   qubit.y(q[0])
   job = execute(qubit, S_simulator)
-  result_q = job.result()
+  result_qkit = job.result()
 
-  arr1 = result_q.get_statevector()
-  arr2 = result_3.tensor.flatten()
-  assert np.testing.assert_allclose(arr1, arr2, atol=1e-5, rtol=1e-5) == None
+  sv_qkit = result_qkit.get_statevector()
+  sv = result.get_state_vector()
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
