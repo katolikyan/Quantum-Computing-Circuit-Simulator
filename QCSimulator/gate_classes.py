@@ -1,6 +1,13 @@
 import tensornetwork as tn
 import numpy as np
 
+class I_gate():
+
+  def __init__(self):
+    gate_op = np.array([[1, 0],
+                        [0, 1]])
+    self.node = tn.Node(gate_op)
+
 class X_gate():
 
   def __init__(self):
@@ -11,8 +18,8 @@ class X_gate():
 class Y_gate():
 
   def __init__(self):
-    gate_op = np.array([[0, 0 - 1j],
-                        [0 + 1j, 0]])
+    gate_op = np.array([[0, 1j],
+                        [-1j, 0]])
     self.node = tn.Node(gate_op)
 
 class Z_gate():
@@ -34,6 +41,15 @@ class T_gate():
   def __init__(self):
     gate_op = np.array([[1, 0],
                         [0, np.exp(1j * np.pi / 4)]])
+    self.node = tn.Node(gate_op)
+
+class CI_gate():
+
+  def __init__(self):
+    gate_op = np.array([[1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 0, 0, 1]]).reshape(2, 2, 2, 2)
     self.node = tn.Node(gate_op)
 
 class CX_gate():
@@ -60,8 +76,8 @@ class CY_gate():
   def __init__(self):
     gate_op = np.array([[1, 0, 0, 0],
                         [0, 1, 0, 0],
-                        [0, 0, 0, 0 - 1j],
-                        [0, 0, 0 + 1j, 0]]).reshape(2, 2, 2, 2)
+                        [0, 0, 0, 0 + 1j],
+                        [0, 0, - 1j, 0]]).reshape(2, 2, 2, 2)
     self.node = tn.Node(gate_op)
 
 
