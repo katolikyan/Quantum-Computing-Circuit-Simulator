@@ -1,7 +1,7 @@
 import tensornetwork as tn
 import numpy as np
-import QCSimulator.gate_classes as gates
-from QCSimulator.execution_results import Execution_result
+import qcsimulator.gate_classes as gates
+from qcsimulator.execution_results import Execution_result
 
 class Circuit():
 

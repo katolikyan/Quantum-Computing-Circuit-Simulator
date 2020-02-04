@@ -1,4 +1,4 @@
-import QCSimulator as qcs
+import qcsimulator as qcs
 import numpy as np
 import tensornetwork as tn
 import pytest
