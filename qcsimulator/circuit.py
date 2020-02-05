@@ -18,12 +18,12 @@ class Circuit():
       self._qbits.append(qbit)
       self._edges.append(qbit[0])
 
-    # Outer product connecction.
+    # --- Outer product connecction onprion.
     #self.circuit = tn.outer_product_final_nodes(self._qbits, self._edges)
     #for i, edge in enumerate(self.circuit):
     #  self._edges[i] = edge
 
-    # Controlled identity connecction at the begining.
+    # --- Controlled identity connecction at the begining oprioon.
     #for i in range(len(self._edges) - 1):
     #  self.ci(i, i + 1)
 
@@ -122,13 +122,11 @@ class Circuit():
     self._edges[b] = ch.node[3]
 
   def execute(self) -> Execution_result:
-    # experimental controlled identity connection befoe execution.
     for i in range(len(self._edges) - 1):
       self.ci(i, i + 1)
 
     nodes = tn.reachable(self._edges[0])
-    #result_node = tn.contractors.greedy(nodes, self._edges)
-    result_node = tn.contractors.greedy(nodes, self._edges) #ignore_edge_order=True)
+    result_node = tn.contractors.greedy(nodes, self._edges)
     result = Execution_result(result_node)
     for i in range(len(result_node.tensor.shape)):
       self._edges[i] = result_node.get_edge(i)
