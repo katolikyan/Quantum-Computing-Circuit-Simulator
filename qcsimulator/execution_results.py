@@ -31,7 +31,11 @@ class Execution_result():
     if not isinstance(little_endian, bool):
       raise  ValueError("The little_endian parametr is a bool.")
 
-    bitstring_key = bitstring
+    if isinstance(bitstring, list):
+      bitstring_key = ''.join(str(i) for i in bitstring)
+    else:
+      bitstring_key = bitstring
+
     if little_endian:
       bitstring = bitstring[::-1]
     crnt = self.__state_node.tensor
@@ -39,16 +43,6 @@ class Execution_result():
       crnt = crnt[int(bitstring[i])]
     return {bitstring_key: (crnt * np.conj(crnt)).real}
 
-#    def _find(demention, bitstring, tensor):
-#      crnt = tensor
-#      for i in range(demention):
-#        crnt = crnt[int(bitstring[i])]
-#      return {bitstring: (crnt * np.conj(crnt)).real}
-#
-#    if little_endian:
-#      bitstring = bitstring[::-1]
-#    return _find(demention, bitstring, self.__state_node.tensor)
-#
   def get_all_probabilities(self, little_endian: bool = False) -> list:
     demention = len(self.__state_node.tensor.shape)
     strs = ["".join(seq) for seq in itertools.product("01", repeat=demention)]

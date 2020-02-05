@@ -22,6 +22,13 @@ def test_get_single_probability():
   assert prob_2["01"] == pytest.approx(prob_table["01"], 1e-3)
   assert prob_3["11"] == pytest.approx(prob_table["11"], 1e-3)
 
+def test_bitstring_as_a_list_test():
+  prob_0 = result.get_bitstr_probability([0, 0]);
+  prob_2 = result.get_bitstr_probability([0, 1]);
+
+  assert prob_0["00"] == pytest.approx(prob_table["00"], 1e-3)
+  assert prob_2["01"] == pytest.approx(prob_table["01"], 1e-3)
+
 def test_get_single_little_endian_probability():
   prob_0 = result.get_bitstr_probability("00", little_endian=True);
   prob_1 = result.get_bitstr_probability("10", little_endian=True);
