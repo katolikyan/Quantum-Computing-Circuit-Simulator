@@ -18,12 +18,20 @@ class Circuit():
       self._qbits.append(qbit)
       self._edges.append(qbit[0])
 
-    # --- Outer product connecction onprion.
+    # --- Take a str parametr to __init__ to create a circuit with certain
+    #     bitstring on it.
+
+    # --- Register creation option:
+    # --- Create a matrix instead of multiple qubits. and reshape it. option.
+
+    # --- Register creation option:
+    # --- Outer product connecction option.
     #self.circuit = tn.outer_product_final_nodes(self._qbits, self._edges)
     #for i, edge in enumerate(self.circuit):
     #  self._edges[i] = edge
 
-    # --- Controlled identity connecction at the begining oprioon.
+    # --- Register creation option:
+    # --- Controlled identity connecction at the begining.
     #for i in range(len(self._edges) - 1):
     #  self.ci(i, i + 1)
 
