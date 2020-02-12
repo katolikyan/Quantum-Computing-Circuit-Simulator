@@ -161,3 +161,49 @@ def test_h_ch_circuit_qiskit_comparison():
   sv_qkit = result_qkit.get_statevector()
 
   assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_qft_reverse_qft():
+  circuit = qcs.circuit_init(4)
+  circuit.h(0)
+  circuit.x(1)
+  circuit.h(2)
+  circuit.x(3)
+  result = circuit.execute()
+  sv_init = result.get_state_vector()
+
+  circuit.qft(0, 3)
+  circuit.qft_rev(0, 3)
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  assert np.testing.assert_allclose(sv, sv_init, atol=1e-8, rtol=1e-8) == None
+
+
+def test_qft_vs_manual_qiskit_qft_comparison():
+  circuit = qcs.circuit_init(3)
+  circuit.i(0)
+  circuit.i(1)
+  circuit.x(2)
+  circuit.qft(0, 2)
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(3)
+  qubit = QuantumCircuit(q)
+  qubit.iden(q[0])
+  qubit.iden(q[1])
+  qubit.x(q[2])
+  #QFT
+  qubit.h(q[0])
+  qubit.cu1(np.pi / 2, q[1], q[0])
+  qubit.cu1(np.pi / 4, q[2], q[0])
+  qubit.h(q[1])
+  qubit.cu1(np.pi / 4, q[2], q[1])
+  qubit.h(q[2])
+
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+  sv_qkit = result_qkit.get_statevector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None

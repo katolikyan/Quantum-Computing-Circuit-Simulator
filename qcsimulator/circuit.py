@@ -129,6 +129,31 @@ class Circuit():
     self._edges[a] = ch.node[2]
     self._edges[b] = ch.node[3]
 
+  def crot(self, a: int, b: int, angle: float) -> None:
+    if not np.isreal(angle):
+      raise ValueError("angle parameter have to be a real number")
+    self._check_input(a, b)
+    crot = gates.CROT_gate(angle)
+    self._edges[a] ^ crot.node[0]
+    self._edges[b] ^ crot.node[1]
+    self._edges[a] = crot.node[2]
+    self._edges[b] = crot.node[3]
+
+  def qft(self, a: int, b: int) -> None:
+    self._check_input(a, b)
+    for i in range(a, b + 1):
+      self.h(i)
+      for j in range(i, b):
+        angle = np.pi / (2 ** (j + 1))
+        self.crot(j + 1, i, angle)
+
+  def qft_rev(self, a: int, b: int) -> None:
+    for i in reversed(range(a, b + 1)):
+      for j in reversed(range(i, b)):
+        angle = -1 * np.pi / (2 ** (j + 1))
+        self.crot(j + 1, i, angle)
+      self.h(i)
+
   def execute(self) -> Execution_result:
     for i in range(len(self._edges) - 1):
       self.ci(i, i + 1)

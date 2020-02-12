@@ -225,3 +225,25 @@ def test_ch_gate_qiskit_comparison():
   sv_qkit = result_qkit.get_statevector()
 
   assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_crot_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(3)
+  circuit.h(0)
+  circuit.x(1)
+  circuit.crot(0, 1, np.pi / 4)
+  circuit.crot(1, 2, np.pi / 16)
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(3)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.x(q[1])
+  qubit.cu1(np.pi / 4, q[0], q[1])
+  qubit.cu1(np.pi / 16, q[1], q[2])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+  sv_qkit = result_qkit.get_statevector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None

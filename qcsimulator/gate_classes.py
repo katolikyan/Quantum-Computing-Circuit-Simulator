@@ -90,3 +90,13 @@ class CH_gate():
                         [0, 0, 1 / np.sqrt(2), -1 / np.sqrt(2)]]).\
                         reshape(2, 2, 2, 2)
     self.node = tn.Node(gate_op)
+
+class CROT_gate():
+
+  def __init__(self, angle: float):
+    gate_op = np.array([[1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 0, 0, np.exp(1j * angle)]]).\
+                        reshape(2, 2, 2, 2)
+    self.node = tn.Node(gate_op)
