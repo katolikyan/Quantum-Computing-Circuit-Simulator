@@ -38,121 +38,127 @@ class Circuit():
   def _qbit_init(self):
     return tn.Node(np.array([1.0 + 0j, 0.0 + 0j]))
 
-  def _check_input(self, *indexes):
+  def _check_input(self, *indexes, only_positive=False):
     distinct = []
     for index in indexes:
       if not isinstance(index, int):
         raise ValueError("The values have to be indexes of "
                          "the circuit's qubits.")
-      if index >= self._num_of_qbits or index < -self._num_of_qbits:
-        raise ValueError("Index passed in is out of range. "
-                         "Index represents the qbit you are trying to access.")
+      if only_positive:
+        if index >= self._num_of_qbits or index < 0:
+          raise ValueError("Index passed in is out of range. This method "
+                           "currently accepts only positive indices.")
+      else:
+        if index >= self._num_of_qbits or index < -self._num_of_qbits:
+          raise ValueError("Index passed in is out of range. Index "\
+                           "represents the qbit you are trying to access.")
       if index not in distinct:
         distinct.append(index)
       else:
         raise ValueError("Indexes of qbits have to be distinct numbers. "
                          "It helps to prevent usless extra  calculations.")
 
-  def i(self, a: int) -> None:
-    self._check_input(a)
+  def i(self, qubit_idx: int) -> None:
+    self._check_input(qubit_idx)
     i_gate = gates.I_gate()
-    self._edges[a] ^ i_gate.node[0]
-    self._edges[a] = i_gate.node[1]
+    self._edges[qubit_idx] ^ i_gate.node[0]
+    self._edges[qubit_idx] = i_gate.node[1]
 
-  def x(self, i: int) -> None:
-    self._check_input(i)
+  def x(self, qubit_idx: int) -> None:
+    self._check_input(qubit_idx)
     x = gates.X_gate()
-    self._edges[i] ^ x.node[0]
-    self._edges[i] = x.node[1]
+    self._edges[qubit_idx] ^ x.node[0]
+    self._edges[qubit_idx] = x.node[1]
 
-  def y(self, i: int) -> None:
-    self._check_input(i)
+  def y(self, qubit_idx: int) -> None:
+    self._check_input(qubit_idx)
     y = gates.Y_gate()
-    self._edges[i] ^ y.node[0]
-    self._edges[i] = y.node[1]
+    self._edges[qubit_idx] ^ y.node[0]
+    self._edges[qubit_idx] = y.node[1]
 
-  def z(self, i: int) -> None:
-    self._check_input(i)
+  def z(self, qubit_idx: int) -> None:
+    self._check_input(qubit_idx)
     z = gates.Z_gate()
-    self._edges[i] ^ z.node[0]
-    self._edges[i] = z.node[1]
+    self._edges[qubit_idx] ^ z.node[0]
+    self._edges[qubit_idx] = z.node[1]
 
-  def h(self, i: int) -> None:
-    self._check_input(i)
+  def h(self, qubit_idx: int) -> None:
+    self._check_input(qubit_idx)
     h = gates.H_gate()
-    self._edges[i] ^ h.node[0]
-    self._edges[i] = h.node[1]
+    self._edges[qubit_idx] ^ h.node[0]
+    self._edges[qubit_idx] = h.node[1]
 
-  def t(self, i: int) -> None:
-    self._check_input(i)
+  def t(self, qubit_idx: int) -> None:
+    self._check_input(qubit_idx)
     t = gates.T_gate()
-    self._edges[i] ^ t.node[0]
-    self._edges[i] = t.node[1]
+    self._edges[qubit_idx] ^ t.node[0]
+    self._edges[qubit_idx] = t.node[1]
 
-  def ci(self, a: int, b: int) -> None:
-    self._check_input(a, b)
+  def ci(self, control: int, target: int) -> None:
+    self._check_input(control, target)
     ci = gates.CI_gate()
-    self._edges[a] ^ ci.node[0]
-    self._edges[b] ^ ci.node[1]
-    self._edges[a] = ci.node[2]
-    self._edges[b] = ci.node[3]
+    self._edges[control] ^ ci.node[0]
+    self._edges[target]  ^ ci.node[1]
+    self._edges[control] = ci.node[2]
+    self._edges[target]  = ci.node[3]
 
-  def cx(self, a: int, b: int) -> None:
-    self._check_input(a, b)
+  def cx(self, control: int, target: int) -> None:
+    self._check_input(control, target)
     cx = gates.CX_gate()
-    self._edges[a] ^ cx.node[0]
-    self._edges[b] ^ cx.node[1]
-    self._edges[a] = cx.node[2]
-    self._edges[b] = cx.node[3]
+    self._edges[control] ^ cx.node[0]
+    self._edges[target]  ^ cx.node[1]
+    self._edges[control] = cx.node[2]
+    self._edges[target]  = cx.node[3]
 
-  def cz(self, a: int, b: int) -> None:
-    self._check_input(a, b)
+  def cz(self, control: int, target: int) -> None:
+    self._check_input(control, target)
     cz = gates.CZ_gate()
-    self._edges[a] ^ cz.node[0]
-    self._edges[b] ^ cz.node[1]
-    self._edges[a] = cz.node[2]
-    self._edges[b] = cz.node[3]
+    self._edges[control] ^ cz.node[0]
+    self._edges[target]  ^ cz.node[1]
+    self._edges[control] = cz.node[2]
+    self._edges[target]  = cz.node[3]
 
-  def cy(self, a: int, b: int) -> None:
-    self._check_input(a, b)
+  def cy(self, control: int, target: int) -> None:
+    self._check_input(control, target)
     cy = gates.CY_gate()
-    self._edges[a] ^ cy.node[0]
-    self._edges[b] ^ cy.node[1]
-    self._edges[a] = cy.node[2]
-    self._edges[b] = cy.node[3]
+    self._edges[control] ^ cy.node[0]
+    self._edges[target]  ^ cy.node[1]
+    self._edges[control] = cy.node[2]
+    self._edges[target]  = cy.node[3]
 
-  def ch(self, a: int, b: int) -> None:
-    self._check_input(a, b)
+  def ch(self, control: int, target: int) -> None:
+    self._check_input(control, target)
     ch = gates.CH_gate()
-    self._edges[a] ^ ch.node[0]
-    self._edges[b] ^ ch.node[1]
-    self._edges[a] = ch.node[2]
-    self._edges[b] = ch.node[3]
+    self._edges[control] ^ ch.node[0]
+    self._edges[target]  ^ ch.node[1]
+    self._edges[control] = ch.node[2]
+    self._edges[target]  = ch.node[3]
 
-  def crot(self, a: int, b: int, angle: float) -> None:
+  def crot(self, control: int, target: int, angle: float) -> None:
     if not np.isreal(angle):
       raise ValueError("angle parameter have to be a real number")
-    self._check_input(a, b)
+    self._check_input(control, target)
     crot = gates.CROT_gate(angle)
-    self._edges[a] ^ crot.node[0]
-    self._edges[b] ^ crot.node[1]
-    self._edges[a] = crot.node[2]
-    self._edges[b] = crot.node[3]
+    self._edges[control] ^ crot.node[0]
+    self._edges[target]  ^ crot.node[1]
+    self._edges[control] = crot.node[2]
+    self._edges[target]  = crot.node[3]
 
-  def qft(self, a: int, b: int) -> None:
-    self._check_input(a, b)
-    for i in range(a, b + 1):
-      self.h(i)
-      for j in range(i, b):
-        angle = np.pi / (2 ** (j + 1))
-        self.crot(j + 1, i, angle)
+  def qft(self, first: int, last: int) -> None:
+    self._check_input(first, last, only_positive=True)
+    for crnt in range(first, last + 1):
+      self.h(crnt)
+      for i in range(crnt, last):
+        angle = np.pi / (2 ** (i + 1))
+        self.crot(i + 1, crnt, angle)
 
-  def qft_rev(self, a: int, b: int) -> None:
-    for i in reversed(range(a, b + 1)):
-      for j in reversed(range(i, b)):
-        angle = -1 * np.pi / (2 ** (j + 1))
-        self.crot(j + 1, i, angle)
-      self.h(i)
+  def qft_rev(self, first: int, last: int) -> None:
+    self._check_input(first, last, only_positive=True)
+    for crnt in reversed(range(first, last + 1)):
+      for i in reversed(range(crnt, last)):
+        angle = -1 * np.pi / (2 ** (i + 1))
+        self.crot(i + 1, crnt, angle)
+      self.h(crnt)
 
   def execute(self) -> Execution_result:
     for i in range(len(self._edges) - 1):
