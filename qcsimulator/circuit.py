@@ -134,6 +134,14 @@ class Circuit():
     self._edges[control] = ch.node[2]
     self._edges[target]  = ch.node[3]
 
+  def swap(self, first: int, second: int) -> None:
+    self._check_input(first, second)
+    swap = gates.SWAP_gate()
+    self._edges[first]   ^ swap.node[0]
+    self._edges[second]  ^ swap.node[1]
+    self._edges[first]   = swap.node[2]
+    self._edges[second]  = swap.node[3]
+
   def crot(self, control: int, target: int, angle: float) -> None:
     if not np.isreal(angle):
       raise ValueError("angle parameter have to be a real number")

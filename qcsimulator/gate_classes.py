@@ -100,3 +100,12 @@ class CROT_gate():
                         [0, 0, 0, np.exp(1j * angle)]]).\
                         reshape(2, 2, 2, 2)
     self.node = tn.Node(gate_op)
+
+class SWAP_gate():
+
+  def __init__(self):
+    gate_op = np.array([[1, 0, 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 0, 1]]).reshape(2, 2, 2, 2)
+    self.node = tn.Node(gate_op)

@@ -30,6 +30,7 @@ def test_single_gates_simpletest():
   circuit.z(0)
   circuit.h(0)
   circuit.t(0)
+  circuit.i(0)
   result = circuit.execute()
 
 def test_controll_gates_simpletest():
@@ -38,6 +39,8 @@ def test_controll_gates_simpletest():
   circuit.cx(0, 1)
   circuit.cy(0, 1)
   circuit.cz(0, 1)
+  circuit.crot(0, 1, np.pi / 4)
+  circuit.ci(0, 1)
   result = circuit.execute()
 
 def test_i_gate_qiskit_comparison():
@@ -242,6 +245,26 @@ def test_crot_gate_qiskit_comparison():
   qubit.x(q[1])
   qubit.cu1(np.pi / 4, q[0], q[1])
   qubit.cu1(np.pi / 16, q[1], q[2])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+  sv_qkit = result_qkit.get_statevector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_swap_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(2)
+  circuit.h(0)
+  circuit.x(1)
+  circuit.swap(0, 1)
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(2)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.x(q[1])
+  qubit.swap(q[0], q[1])
   job = execute(qubit, S_simulator)
   result_qkit = job.result()
   sv_qkit = result_qkit.get_statevector()

@@ -14,6 +14,7 @@ def test_random_circuit_generator_qiskit_comparison():
              "circuit.z({})", "circuit.h({})", "circuit.t({})", \
              "circuit.cx({}, {})", "circuit.cy({}, {})", \
              "circuit.cz({}, {})", "circuit.ch({}, {})", \
+             "circuit.swap({}, {})", \
              "circuit.crot({}, {}, {})"]
   gates_qkit = ["qubit.iden(q_reg[{}])", "qubit.x(q_reg[{}])", \
                 "qubit.y(q_reg[{}])", "qubit.z(q_reg[{}])", \
@@ -22,8 +23,9 @@ def test_random_circuit_generator_qiskit_comparison():
                 "qubit.cy(q_reg[{}], q_reg[{}])", \
                 "qubit.cz(q_reg[{}], q_reg[{}])", \
                 "qubit.ch(q_reg[{}], q_reg[{}])", \
+                "qubit.swap(q_reg[{}], q_reg[{}])", \
                 "qubit.cu1({},q_reg[{}], q_reg[{}])"]
-  gate_n_params = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3]
+  gate_n_params = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3]
   func_len = len(gates_c)
   S_simulator = Aer.backends(name='statevector_simulator')[0]
   #errors = 0
