@@ -5,25 +5,33 @@ from random import choices
 import qcsimulator.config as config
 import itertools
 
-# --- ! This class is a mess, need to be refactored !
-
-# --- Store all the probabilities ones to skip useless calculations everytime!
-
-# --- Having all the results stored in specific endian, config,
-#     and ability to change endian in each function look like a foot gun!
-#     mb concider to remove all the options in functions and just use config.
-
 class Execution_result():
 
-  def __init__(self, state_node: tn.Node) -> None:
+  def __init__(self, state_node: tn.Node, probs_autocalc: bool = True) -> None:
     self.__state_node = state_node
-    #self._all_probabilities = None   # all probs to not calc them mult times
-    #self.__endian = config.little_endian # info about endian
-    #self.__probs_tensor   ...    # calculate all probs as a tensor?
+    self._little_endian = config.little_endian
+    self._demention = len(self.__state_node.tensor.shape)
+    self._all_probs = None
+    if probs_autocalc:
+      self._all_probs = self._calc_all_probabilities()
 
-  #@property
-  #def endian(self):
-  #  return self.__endian
+  def _calc_all_probabilities(self) -> dict:
+    strs = ["".join(seq) for seq in \
+            itertools.product("01", repeat=self._demention)]
+    all_probs = {}
+    for bitstring in strs:
+      bitstring_key = bitstring
+      if self._little_endian:
+        bitstring = bitstring[::-1]
+      crnt = self.__state_node.tensor
+      for i in range(self._demention):
+        crnt = crnt[int(bitstring[i])]
+      prob = (crnt * np.conj(crnt)).real
+      all_probs[bitstring_key] = prob
+    return all_probs
+
+  def calculate_probabilities():
+      self._all_probs = self._calc_all_probabilities()
 
   def get_state_vector(self) -> np.ndarray:
     return self.__state_node.tensor.flatten('F')
@@ -31,73 +39,75 @@ class Execution_result():
   def get_state_tensor(self) -> np.ndarray:
     return self.__state_node.tensor
 
-  def get_bitstr_probability(self, bitstring: Union[str, list] = None, \
-                                          little_endian: bool = None) -> dict:
-    if little_endian == None:
-      little_endian = config.little_endian
-    demention = len(self.__state_node.tensor.shape)
+  def get_all_probabilities(self) -> dict:
+    if not self._all_probs:
+      raise ValueError("autocalc was disabled, need to calculate probs first.")
+    return self._all_probs
+
+  def get_bitstr_probability(self, bitstring: str = None) -> dict:
+    if not self._all_probs:
+      raise ValueError("autocalc was disabled, need to calculate probs first.")
     if bitstring:
-      if not isinstance(bitstring, (str, list)):
-        raise ValueError("The bitstring have to be represented as a string or "
-                        "as a list of indexes.")
+      if not isinstance(bitstring, str):
+        raise TypeError("bitstring parameter have to be a string.")
+      if self._demention != len(bitstring):
+        raise ValueError("Number of indecies in bitstring have to be equal to "
+                         "the number of qbits.")
+      if any((not char in "01") for char in bitstring):
+        raise ValueError("bitstring have to contain only with 0 and 1 chars. ")
     else:
-      bitstring = ''.join(choices("10", k=demention))
-    if demention != len(bitstring):
-      raise ValueError("The bitstring length have to be exactly equal to "
-                       "number of qbits.")
-    if not isinstance(little_endian, bool):
-      raise  ValueError("The little_endian parametr is a bool.")
+      bitstring = ''.join(choices("10", k=self._demention))
+    return {bitstring: self._all_probs[bitstring]}
 
-    if isinstance(bitstring, list):
-      bitstring_key = ''.join(str(i) for i in bitstring)
-    else:
-      bitstring_key = bitstring
-
-    if little_endian:
-      bitstring = bitstring[::-1]
-    crnt = self.__state_node.tensor
-    for i in range(demention):
-      crnt = crnt[int(bitstring[i])]
-    return {bitstring_key: (crnt * np.conj(crnt)).real}
-
-  def get_all_probabilities(self, little_endian: bool = None) -> list:
-    if little_endian == None:
-      little_endian = config.little_endian
-    #if self._all_probabilities != None:
-    #  return self.__all_probabilities
-
-    demention = len(self.__state_node.tensor.shape)
-    strs = ["".join(seq) for seq in itertools.product("01", repeat=demention)]
-    prob_result = []
-    for string in strs:
-      prob_result.append(self.get_bitstr_probability(string, little_endian))
-    #self._all_probabilities = prob_result
-    #return self._all_probabilities
-    return prob_result
-
-  def get_single_qubit_probability(self, n_qubit: int, \
-                                          little_endian: bool = None) -> list:
-    if little_endian == None:
-      little_endian = config.little_endian
+  def get_single_qubit_probability(self, n_qubit: int) -> list:
+    if not self._all_probs:
+      raise ValueError("Autocalc was disabled, need to calculate probs first.")
     if not isinstance(n_qubit, int):
-      raise ValueError("pass the particular qubit index")
-    bitstr_len = len(self.__state_node.tensor.shape)
-    if n_qubit >= bitstr_len or n_qubit < -1 * bitstr_len:
-      raise ValueError("index is out of range")
+      raise TypeError("n_qubit have to be an integer and valid qubit index")
+    if n_qubit >= self._demention or n_qubit < -1 * self._demention:
+      raise IndexError("index is out of range")
+    prob_for_0 = 0
+    prob_for_1 = 0
+    for bitstr in self._all_probs:
+      qubit = bitstr[::-1][n_qubit] if self._little_endian else bitstr[n_qubit]
+      if qubit == "0":
+        prob_for_0 += self._all_probs[bitstr]
+      else:
+        prob_for_1 += self._all_probs[bitstr]
+    return {"0": prob_for_0, "1": prob_for_1}
 
-    prob_for_0 = []
-    prob_for_1 = []
+  def get_n_qubit_probability(self, start: int, stop: int) -> list:
+    if not self._all_probs:
+      raise ValueError("autocalc was disabled, need to calculate probs first.")
+    if start < 0 or stop < 0:
+      raise IndexError("Currently get_n_qubit_probability accepts only "
+                       "positive indecies.")
+    if start > self._demention or stop > self._demention:
+      raise IndexError("start or stop value is out of range.")
+
+    count = stop - start
+    bitstrings = ["".join(seq) for seq in \
+                  itertools.product("01", repeat=count)]
     all_probs = self.get_all_probabilities()
+    n = self._demention
+    slice_probs = {}
+    for bitstring in bitstrings:
+      slice_probs[bitstring] = 0
+    for bitstring in all_probs:
+      if self._little_endian:
+        slice_probs[bitstring[n - stop:n - start]] += all_probs[bitstring]
+      else:
+        slice_probs[bitstring[start:stop]] += all_probs[bitstring]
+    return slice_probs
 
-    for prob in all_probs:
-      for key in prob:
-        if little_endian:
-          qubit = key[::-1][n_qubit]
-        if qubit == "0":
-          prob_for_0.append(prob[key])
-        else:
-          prob_for_1.append(prob[key])
-    return {"0": sum(prob_for_0), "1": sum(prob_for_1)}
+#  def __str__(self):
+#    print("qcsimulator.execution_results.Execution_result object")
+#    if self._little_endian:
+#      print("Probabilities are in little endian")
+#    else:
+#      print("Probabilities are in big endian")
+#    print("State tensor info:")
+#    print(self.__state_node)
 
 
 # --- something more interesting to return instead of dictionaries ?

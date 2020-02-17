@@ -76,7 +76,7 @@ def test_random_circuit_generator_qiskit_comparison():
           exec(qiskit_gate.format(angle, q + 1, q))
 
     # getting and comparing results
-    result = circuit.execute()
+    result = circuit.execute(probs_autocalc=False)
     sv = result.get_state_vector()
     job = execute(qubit, S_simulator)
     result_qkit = job.result()

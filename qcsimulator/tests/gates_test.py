@@ -10,17 +10,17 @@ def test_gates_check_input():
   circuit.x(-1)
   circuit.cx(-2, -1)
   circuit.cx(1, 0)
-  with(pytest.raises(ValueError)):
+  with(pytest.raises(IndexError)):
     circuit.x(2)
-  with(pytest.raises(ValueError)):
+  with(pytest.raises(IndexError)):
     circuit.x(-3)
-  with(pytest.raises(ValueError)):
+  with(pytest.raises(IndexError)):
     circuit.cx(1, -3)
-  with(pytest.raises(ValueError)):
+  with(pytest.raises(IndexError)):
     circuit.cx(4, 0)
   with(pytest.raises(ValueError)):
     circuit.cx(0, 0)
-  with(pytest.raises(ValueError)):
+  with(pytest.raises(TypeError)):
     circuit.x("0")
 
 def test_single_gates_simpletest():
@@ -41,6 +41,7 @@ def test_controll_gates_simpletest():
   circuit.cz(0, 1)
   circuit.crot(0, 1, np.pi / 4)
   circuit.ci(0, 1)
+  circuit.swap(0, 1)
   result = circuit.execute()
 
 def test_i_gate_qiskit_comparison():

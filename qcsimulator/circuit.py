@@ -42,15 +42,15 @@ class Circuit():
     distinct = []
     for index in indexes:
       if not isinstance(index, int):
-        raise ValueError("The values have to be indexes of "
+        raise TypeError("The values have to be integers - indexes of "
                          "the circuit's qubits.")
       if only_positive:
         if index >= self._num_of_qbits or index < 0:
-          raise ValueError("Index passed in is out of range. This method "
+          raise IndexError("Index passed in is out of range. This method "
                            "currently accepts only positive indices.")
       else:
         if index >= self._num_of_qbits or index < -self._num_of_qbits:
-          raise ValueError("Index passed in is out of range. Index "\
+          raise IndexError("Index passed in is out of range. Index "
                            "represents the qbit you are trying to access.")
       if index not in distinct:
         distinct.append(index)
@@ -168,13 +168,14 @@ class Circuit():
         self.crot(i + 1, crnt, angle)
       self.h(crnt)
 
-  def execute(self) -> Execution_result:
+  def execute(self, probs_autocalc: bool = True) -> Execution_result:
+    if not isinstance(probs_autocalc, bool):
+      raise TypeError("probs_autocalc is a bool parametr")
     for i in range(len(self._edges) - 1):
       self.ci(i, i + 1)
-
     nodes = tn.reachable(self._edges[0])
     result_node = tn.contractors.greedy(nodes, self._edges)
-    result = Execution_result(result_node)
+    result = Execution_result(result_node, probs_autocalc=probs_autocalc)
     for i in range(len(result_node.tensor.shape)):
       self._edges[i] = result_node.get_edge(i)
     return result
@@ -182,7 +183,7 @@ class Circuit():
 
 def circuit_init(n_qbit: int) -> Circuit:
   if not isinstance(n_qbit, int):
-    raise ValueError("The only parametr circuit_init accsepts is a number "
+    raise TypeError("The only parametr circuit_init accsepts is an integer "
                      "describing number of qbits on the circuit")
   if n_qbit < 1:
     raise ValueError("The number of qbits have to be a positiv number. (1-20)")
