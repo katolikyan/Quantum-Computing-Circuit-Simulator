@@ -10,22 +10,40 @@ n_of_circuits_generated = 100
 n_of_gates_per_circuit = 15
 
 def test_random_circuit_generator_qiskit_comparison():
-  gates_c = ["circuit.i({})", "circuit.x({})", "circuit.y({})", \
-             "circuit.z({})", "circuit.h({})", "circuit.t({})", \
-             "circuit.cx({}, {})", "circuit.cy({}, {})", \
-             "circuit.cz({}, {})", "circuit.ch({}, {})", \
+  gates_c = ["circuit.i({})", \
+             "circuit.x({})", \
+             "circuit.y({})", \
+             "circuit.z({})", \
+             "circuit.h({})", \
+             "circuit.t({})", \
+             "circuit.cx({}, {})", \
+             "circuit.cy({}, {})", \
+             "circuit.cz({}, {})", \
+             "circuit.ch({}, {})", \
              "circuit.swap({}, {})", \
+             #"circuit.rx({}, {})", \
+             #"circuit.ry({}, {})", \
+             #"circuit.rz({}, {})", \
+             "circuit.rot({}, {})", \
              "circuit.crot({}, {}, {})"]
-  gates_qkit = ["qubit.iden(q_reg[{}])", "qubit.x(q_reg[{}])", \
-                "qubit.y(q_reg[{}])", "qubit.z(q_reg[{}])", \
-                "qubit.h(q_reg[{}])", "qubit.t(q_reg[{}])", \
+  gates_qkit = ["qubit.iden(q_reg[{}])", \
+                "qubit.x(q_reg[{}])", \
+                "qubit.y(q_reg[{}])", \
+                "qubit.z(q_reg[{}])", \
+                "qubit.h(q_reg[{}])", \
+                "qubit.t(q_reg[{}])", \
                 "qubit.cx(q_reg[{}], q_reg[{}])", \
                 "qubit.cy(q_reg[{}], q_reg[{}])", \
                 "qubit.cz(q_reg[{}], q_reg[{}])", \
                 "qubit.ch(q_reg[{}], q_reg[{}])", \
                 "qubit.swap(q_reg[{}], q_reg[{}])", \
+                #"qubit.rx({}, q_reg[{}])", \
+                #"qubit.ry({}, q_reg[{}])", \
+                #"qubit.rz({}, q_reg[{}])", \
+                "qubit.u1({}, q_reg[{}])", \
                 "qubit.cu1({},q_reg[{}], q_reg[{}])"]
-  gate_n_params = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3]
+  gate_type = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 4]
+  #gate_type = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4]
   func_len = len(gates_c)
   S_simulator = Aer.backends(name='statevector_simulator')[0]
   #errors = 0
@@ -43,15 +61,15 @@ def test_random_circuit_generator_qiskit_comparison():
       gate_choice = random.randrange(0, func_len)
       my_gate = gates_c[gate_choice]
       qiskit_gate = gates_qkit[gate_choice]
-      params = gate_n_params[gate_choice]
+      gtype = gate_type[gate_choice]
 
       # single gate
-      if (params == 1):
+      if (gtype == 1):
         exec(my_gate.format(q))
         exec(qiskit_gate.format(q))
 
       # controlled gate
-      elif (params == 2):
+      elif (gtype == 2):
         side = random.choice(["up", "down"])
         if (q == n_qbit - 1):
           q = q - 1
@@ -62,9 +80,15 @@ def test_random_circuit_generator_qiskit_comparison():
           exec(my_gate.format(q + 1, q))
           exec(qiskit_gate.format(q + 1, q))
 
+      # rotation gates
+      if (gtype == 3):
+        angle = random.uniform(-np.pi, np.pi)
+        exec(my_gate.format(q, angle))
+        exec(qiskit_gate.format(angle, q))
+
       # controlled rotation gate
-      elif (params == 3):
-        angle = random.uniform(np.pi/256, np.pi)
+      elif (gtype == 4):
+        angle = random.uniform(-np.pi, np.pi)
         side = random.choice(["up", "down"])
         if (q == n_qbit - 1):
           q = q - 1

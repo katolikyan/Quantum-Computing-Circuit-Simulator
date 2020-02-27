@@ -271,3 +271,124 @@ def test_swap_gate_qiskit_comparison():
   sv_qkit = result_qkit.get_statevector()
 
   assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_rot_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(3)
+  circuit.h(0)
+  circuit.x(1)
+  circuit.rot(0, np.pi / 4)
+  circuit.rot(1, np.pi / 16)
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(3)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.x(q[1])
+  qubit.u1(np.pi / 4, q[0])
+  qubit.u1(np.pi / 16, q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+  sv_qkit = result_qkit.get_statevector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_rx_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(3)
+  circuit.h(0)
+  circuit.x(1)
+  circuit.rx(0, np.pi / 4)
+  circuit.rx(1, np.pi / 16)
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(3)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.x(q[1])
+  qubit.rx(np.pi / 4, q[0])
+  qubit.rx(np.pi / 16, q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+  sv_qkit = result_qkit.get_statevector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_ry_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(3)
+  circuit.h(0)
+  circuit.x(1)
+  circuit.ry(0, np.pi / 4)
+  circuit.ry(1, np.pi / 16)
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(3)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.x(q[1])
+  qubit.ry(np.pi / 4, q[0])
+  qubit.ry(np.pi / 16, q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+  sv_qkit = result_qkit.get_statevector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_rz_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(3)
+  circuit.h(0)
+  circuit.x(1)
+  circuit.rz(0, np.pi / 4)
+  circuit.rz(1, np.pi / 16)
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(3)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.x(q[1])
+  qubit.rz(np.pi / 4, q[0])
+  qubit.rz(np.pi / 16, q[1])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+  sv_qkit = result_qkit.get_statevector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+@pytest.mark.skip
+def test_rxyz_gate_qiskit_comparison():
+  circuit = qcs.circuit_init(3)
+  circuit.h(0)
+  circuit.h(1)
+  circuit.h(2)
+  circuit.rx(1, -np.pi / 4)
+  circuit.rx(2, np.pi / 16)
+  circuit.ry(0, -np.pi / 3)
+  circuit.ry(1, np.pi / 4)
+  circuit.rz(2, -np.pi / 12)
+  circuit.rz(0, np.pi / 6)
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(3)
+  qubit = QuantumCircuit(q)
+  qubit.h(q[0])
+  qubit.h(q[1])
+  qubit.h(q[2])
+  qubit.rx(-np.pi / 4, q[1])
+  qubit.rx(np.pi / 16, q[2])
+  qubit.ry(-np.pi / 3, q[0])
+  qubit.ry(np.pi / 4, q[1])
+  qubit.rz(-np.pi / 12, q[2])
+  qubit.rz(np.pi / 6, q[0])
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+  sv_qkit = result_qkit.get_statevector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None

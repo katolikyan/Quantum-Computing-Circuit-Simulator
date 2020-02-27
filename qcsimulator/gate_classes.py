@@ -43,6 +43,34 @@ class T_gate():
                         [0, np.exp(1j * np.pi / 4)]])
     self.node = tn.Node(gate_op)
 
+class ROT_gate():
+
+  def __init__(self, angle: float):
+    gate_op = np.array([[1, 0],
+                        [0, np.exp(1j * angle)]])
+    self.node = tn.Node(gate_op)
+
+class RX_gate():
+
+  def __init__(self, angle: float):
+    gate_op = np.array([[np.cos(angle / 2), -1j * np.sin(angle / 2)],
+                        [-1j * np.sin(angle / 2), np.cos(angle / 2)]])
+    self.node = tn.Node(gate_op)
+
+class RY_gate():
+
+  def __init__(self, angle: float):
+    gate_op = np.array([[np.cos(angle / 2), np.sin(angle / 2)],
+                        [-np.sin(angle / 2), np.cos(angle / 2)]])
+    self.node = tn.Node(gate_op)
+
+class RZ_gate():
+
+  def __init__(self, angle: float):
+    gate_op = np.array([[1, 0],
+                        [0, np.exp(1j * angle)]])
+    self.node = tn.Node(gate_op)
+
 class CI_gate():
 
   def __init__(self):
@@ -79,7 +107,6 @@ class CY_gate():
                         [0, 0, 0, 0 + 1j],
                         [0, 0, - 1j, 0]]).reshape(2, 2, 2, 2)
     self.node = tn.Node(gate_op)
-
 
 class CH_gate():
 

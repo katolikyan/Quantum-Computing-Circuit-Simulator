@@ -2,6 +2,7 @@ import qcsimulator as qcs
 import numpy as np
 import tensornetwork as tn
 import pytest
+import networkx as nx
 from qiskit import QuantumRegister, QuantumCircuit, execute, Aer
 
 def test_circuit_init():
@@ -178,7 +179,6 @@ def test_qft_reverse_qft():
 
   assert np.testing.assert_allclose(sv, sv_init, atol=1e-8, rtol=1e-8) == None
 
-
 def test_qft_vs_manual_qiskit_qft_comparison():
   circuit = qcs.circuit_init(3)
   circuit.i(0)
@@ -201,6 +201,51 @@ def test_qft_vs_manual_qiskit_qft_comparison():
   qubit.h(q[1])
   qubit.cu1(np.pi / 4, q[2], q[1])
   qubit.h(q[2])
+
+  job = execute(qubit, S_simulator)
+  result_qkit = job.result()
+  sv_qkit = result_qkit.get_statevector()
+
+  assert np.testing.assert_allclose(sv, sv_qkit, atol=1e-8, rtol=1e-8) == None
+
+def test_simple_qaoa_vs_manual_qiskit_qaoa_comparison():
+  n = 5
+  p = 2
+  V = np.arange(0,n,1)
+  E = [(0,1,1.0),(0,2,1.0),(1,2,1.0),(3,2,1.0),(3,4,1.0),(4,2,1.0)]
+  graph = nx.Graph()
+  graph.add_nodes_from(V)
+  graph.add_weighted_edges_from(E)
+
+  betas = np.random.uniform(-np.pi, np.pi, size=p)
+  gammas = np.random.uniform(-np.pi, np.pi, size=p)
+  circuit = qcs.circuit_init(n)
+
+  for i in range(n):
+    circuit.h(i)
+  for beta, gamma in zip(betas, gammas):
+    for i, j in graph.edges:
+      circuit.cx(i, j)
+      circuit.rot(j, gamma)
+      circuit.cx(i, j)
+    for i in range(n):
+      circuit.rx(i, 2 * beta)
+
+  result = circuit.execute()
+  sv = result.get_state_vector()
+
+  S_simulator = Aer.backends(name='statevector_simulator')[0]
+  q = QuantumRegister(n)
+  qubit = QuantumCircuit(q)
+  for i in range(n):
+    qubit.h(q[i])
+  for beta, gamma in zip(betas, gammas):
+    for i, j in graph.edges:
+      qubit.cx(q[int(i)], q[int(j)])
+      qubit.u1(gamma, q[int(j)])
+      qubit.cx(q[int(i)], q[int(j)])
+    for i in range(n):
+      qubit.rx(beta * 2, q[i])
 
   job = execute(qubit, S_simulator)
   result_qkit = job.result()

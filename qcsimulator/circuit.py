@@ -41,7 +41,7 @@ class Circuit():
   def _check_input(self, *indexes, only_positive=False):
     distinct = []
     for index in indexes:
-      if not isinstance(index, int):
+      if not isinstance(index, (int, np.int16, np.int32, np.int64)):
         raise TypeError("The values have to be integers - indexes of "
                          "the circuit's qubits.")
       if only_positive:
@@ -93,6 +93,38 @@ class Circuit():
     t = gates.T_gate()
     self._edges[qubit_idx] ^ t.node[0]
     self._edges[qubit_idx] = t.node[1]
+
+  def rot(self, qubit_idx: int, angle: float) -> None:
+    if not np.isreal(angle):
+      raise ValueError("angle parameter have to be a real number")
+    self._check_input(qubit_idx)
+    rot = gates.ROT_gate(angle)
+    self._edges[qubit_idx] ^ rot.node[0]
+    self._edges[qubit_idx] = rot.node[1]
+
+  def rx(self, qubit_idx: int, angle: float) -> None:
+    if not np.isreal(angle):
+      raise ValueError("angle parameter have to be a real number")
+    self._check_input(qubit_idx)
+    rx = gates.RX_gate(angle)
+    self._edges[qubit_idx] ^ rx.node[0]
+    self._edges[qubit_idx] = rx.node[1]
+
+  def ry(self, qubit_idx: int, angle: float) -> None:
+    if not np.isreal(angle):
+      raise ValueError("angle parameter have to be a real number")
+    self._check_input(qubit_idx)
+    ry = gates.RY_gate(angle)
+    self._edges[qubit_idx] ^ ry.node[0]
+    self._edges[qubit_idx] = ry.node[1]
+
+  def rz(self, qubit_idx: int, angle: float) -> None:
+    if not np.isreal(angle):
+      raise ValueError("angle parameter have to be a real number")
+    self._check_input(qubit_idx)
+    rz = gates.RZ_gate(angle)
+    self._edges[qubit_idx] ^ rz.node[0]
+    self._edges[qubit_idx] = rz.node[1]
 
   def ci(self, control: int, target: int) -> None:
     self._check_input(control, target)
