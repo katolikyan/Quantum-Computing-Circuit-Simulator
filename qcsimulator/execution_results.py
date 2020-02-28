@@ -100,6 +100,16 @@ class Execution_result():
         slice_probs[bitstring[start:stop]] += all_probs[bitstring]
     return slice_probs
 
+  def measure_all(self, shots: int = 32) -> list:
+    if not self._all_probs:
+      raise ValueError("Autocalc was disabled, need to calculate probs first.")
+    measurements = []
+    strings = list(self._all_probs.keys())
+    probs = list(self._all_probs.values())
+    for _i in range(shots):
+      measurements.append(np.random.choice(strings, p=probs))
+    return measurements
+
 #  def __str__(self):
 #    print("qcsimulator.execution_results.Execution_result object")
 #    if self._little_endian:

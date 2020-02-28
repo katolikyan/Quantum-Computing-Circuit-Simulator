@@ -101,6 +101,18 @@ def test_global_config():
   for key in probs:
     assert probs[key] == pytest.approx(prob_table_little_end[key], 1e-3)
 
+def test_measure_all():
+  circuit = qcs.circuit_init(4)
+  circuit.h(2)
+  result = circuit.execute()
+  strs = result.measure_all()
+  assert '0100' in strs
+  assert '0000' in strs
+  assert '0010' not in strs
+  assert '0011' not in strs
+  assert '1010' not in strs
+  assert '1111' not in strs
+
 # Big-endian tests ----------------------------------------------
 qcs.set_global_endian("big-endian")
 result_bigend = circuit.execute()
