@@ -15,7 +15,7 @@ requirements = [ requirement.strip() \
 setup (
   name="qcsimulator",
   version="0.1.0",
-  url="http://github.com/tkatolik/__X",
+  url="https://github.com/katolikyan/QCSimulator",
   author="Tigran Katolikyan",
   author_email="tigrankatolikyan@gmail.com",
   python_requires=(">=3.6.0"),
